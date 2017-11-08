@@ -1,4 +1,5 @@
 import re
+import timeit
 
 from pyquery import PyQuery as pq
 
@@ -20,6 +21,7 @@ def crawl_ip181():
     for addr, port in proxy_array:
         result = addr + ":" + port
         yield result.replace(' ', '')  # 将空格剔除
+
 
 def crawl_xicidaili():
     '''
@@ -83,6 +85,26 @@ def crawl_kxdaili():
             yield result.replace(' ', '')
 
 
+def main():
+    '''
+    调用爬虫函数
+    :return:
+    '''
+    # 获取当前模块对象
+    module = __import__(__name__)
+    # 迭代出当前模块下所有爬虫函数crawl_func
+    for k, v in module.__dict__.items():
+        if 'crawl_' in k:
+            # for proxy in v(): # 方式一：最简单的方式直接调用函数
+
+            # for proxy in eval(k + '()'): # 方式二：使用eval执行字符串代码
+
+            if hasattr(module, k):  # 方式三：使用反射机制获取函数对象
+                get_afunc = getattr(module, k)
+                for proxy in get_afunc():
+                    print(proxy)
+
+
 if __name__ == '__main__':
-    for proxy in crawl_ip181():
-        print(proxy)
+    time = timeit.timeit(stmt=main, number=1)
+    print('共计耗时%s秒' % (time,))
