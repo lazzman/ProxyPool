@@ -54,21 +54,20 @@ class ValidityChecker(object):
                 ) as e:
             logging.warning(e)
 
-
-def check(self):
-    '''
-    异步校验所有代理
-    :return:
-    '''
-    logging.info("开启异步校验代理")
-    loop = asyncio.get_event_loop()
-    try:
-        tasks = [self.check_single_proxy(proxy) for proxy in self._raw_proxies]
-        loop.run_until_complete(asyncio.wait(tasks))
-    except ValueError:
-        logging.error("异步校验代理异常")
-    finally:
-        loop.close()
+    def check(self):
+        '''
+        异步校验所有代理
+        :return:
+        '''
+        logging.info("开启异步校验代理")
+        loop = asyncio.get_event_loop()
+        try:
+            tasks = [self.check_single_proxy(proxy) for proxy in self._raw_proxies]
+            loop.run_until_complete(asyncio.wait(tasks))
+        except ValueError:
+            logging.error("异步校验代理异常")
+        finally:
+            loop.close()
 
 
 class PoolAdder(object):
