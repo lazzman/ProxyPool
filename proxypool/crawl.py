@@ -43,7 +43,7 @@ class ProxyCrawl(object, metaclass=ProxyMetaclass):
         proxies = []
         logging.debug('callback', callback)
         for proxy in eval('self.{}()'.format(callback)):
-            logging.info('获取代理', proxy, '来源', callback)
+            logging.info('获取代理 %s 来源 %s' % (proxy, callback))
             proxies.append(proxy)
         return proxies
 

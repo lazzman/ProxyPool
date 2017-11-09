@@ -37,7 +37,7 @@ class ValidityChecker(object):
         try:
             if isinstance(proxy, bytes):
                 proxy = proxy.decode('utf-8')
-                http_proxy = 'http://' + proxy
+            http_proxy = 'http://' + proxy
             headers = {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.89 Safari/537.36'}
             async with session.get(setting.CHECK_PROXY_USEFULL_URL, timeout=setting.CHECK_PROXY_USEFULL_TIMEOUT,
@@ -65,10 +65,9 @@ class ValidityChecker(object):
         try:
             tasks = [self.check_single_proxy(proxy) for proxy in self._raw_proxies]
             loop.run_until_complete(asyncio.wait(tasks))
+            # loop.close()
         except ValueError:
             logging.error("异步校验代理异常")
-        finally:
-            loop.close()
 
 
 class PoolAdder(object):
@@ -166,3 +165,11 @@ class Schedule(object):
         threshold_process = Process(target=Schedule.add_proxy_to_pool)
         check_process.start()
         threshold_process.start()
+
+
+if __name__ == '__main__':
+    '''
+    手动运行调度器
+    '''
+    sche = Schedule()
+    sche.run()
