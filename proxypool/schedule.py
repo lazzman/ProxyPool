@@ -65,10 +65,10 @@ class ValidityChecker(object):
         try:
             tasks = [self.check_single_proxy(proxy) for proxy in self._raw_proxies]
             loop.run_until_complete(asyncio.wait(tasks))
-            # loop.close()
         except ValueError:
             logging.error("异步校验代理异常")
-
+        finally:
+            loop.close()
 
 class PoolAdder(object):
     '''
