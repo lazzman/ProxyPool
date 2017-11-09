@@ -1,5 +1,7 @@
 import asyncio
 import logging
+import time
+from multiprocessing import Process
 
 import aiohttp
 from aiohttp.client_exceptions import *
@@ -109,3 +111,58 @@ class PoolAdder(object):
                     break
             if proxy_count == 0:
                 raise ResourceDepletionError
+
+
+class Schedule(object):
+    '''
+    调度器模块
+    '''
+
+    @staticmethod
+    def check_pool_proxy_useable(cycle=setting.PROXY_CHECK_CYCLE):
+        '''
+        一定周期从代理池取出一半的代理检查有效性
+        :param cycle:
+        :return:
+        '''
+        conn = RedisClient()
+        checker = ValidityChecker()
+        while True:
+            logging.info("开始校验代理池代理有效性")
+            count = int(0.5 * conn.queueLen)
+            if count == 0:
+                logging.info("代理池中暂无代理，等待添加代理")
+                time.sleep(cycle)
+                continue
+            raw_proxies = conn.getProxy(count)
+            checker.set_raw_proxies(raw_proxies)
+            checker.check()
+            time.sleep(cycle)
+
+    @staticmethod
+    def add_proxy_to_pool(lower_threshold=setting.PROXY_POOL_LOWER_THRESHOLD,
+                          upper_threshold=setting.PROXY_POOL_UPPER_THRESHOLD, cycle=setting.PROXU_POOL_LEN_CHECK_CYCLE):
+        '''
+        一定周期检查代理池中代理数量是否在阈值内，不在则调用添加器添加代理
+        :param lower_threshold:
+        :param upper_threshold:
+        :param cycle:
+        :return:
+        '''
+        conn = RedisClient()
+        adder = PoolAdder(upper_threshold)
+        while True:
+            if conn.queueLen < lower_threshold:
+                adder.pool_add_proxy()
+            time.sleep(cycle)
+
+    def run(self):
+        '''
+        创建两个进程，分别用于校验代理池代理有效性和检查代理池中代理数量是否在阈值内
+        :return:
+        '''
+        logging.info('调度器开始运行')
+        check_process = Process(target=Schedule.check_pool_proxy_useable)
+        threshold_process = Process(target=Schedule.add_proxy_to_pool)
+        check_process.start()
+        threshold_process.start()

@@ -3,7 +3,7 @@ REDIS_HOST = 'localhost'
 REDIS_PORT = 6379  # 默认端口
 REDIS_PASSWORD = ''  # 如果有密码则填写密码，没有则为''
 
-# 代理有效性校验周期（单位秒）
+#  代理池中的代理有效性校验周期（单位秒）
 PROXY_CHECK_CYCLE = 60
 
 # 代理池长度校验周期，当代理数量不在阈值内时会触发代理添加器
