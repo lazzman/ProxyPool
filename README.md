@@ -32,7 +32,7 @@ conda env create -f conda-env.yml
 - crawl.py 爬虫模块
   - class proxy.crawl.ProxyCrawl 爬虫类，用于爬取代理网站上的代理，可按照已有方法名添加新的爬取规则
 - schedule.py 调度器模块
-  - class proxypool.schedule.ValidityTester 异步检测类，可以对给定的代理的可用性进行异步检测。 
+  - class proxypool.schedule.ValidityChecker 代理校验类，可以对给定的代理的可用性进行异步检测。 
   - class proxypool.schedule.PoolAdder 代理添加器，用来触发爬虫模块，对代理池内的代理进行补充，代理池代理数达到阈值时停止工作。 
   - class proxypool.schedule.Schedule 代理池启动类，运行RUN函数时，会创建两个进程，负责对代理池内容的增加和更新。 
 - db.py Redis数据库连接模块 

@@ -36,7 +36,7 @@ class ProxyCrawl(object, metaclass=ProxyMetaclass):
 
     def get_raw_proxies(self, callback):
         '''
-        迭代每个爬虫函数的生成器，循环获取每行代理IP加入到数组中
+        迭代每个爬虫函数的生成器，循环获取每行代理IP加入到数组并返回
         :param callback: 爬虫函数
         :return: 代理数组
         '''
