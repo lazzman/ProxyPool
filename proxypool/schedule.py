@@ -34,8 +34,9 @@ class ValidityChecker(object):
         :param proxy:
         :return:
         '''
-        with aiohttp.ClientSession() as session:
-            try:
+
+        try:
+            with aiohttp.ClientSession() as session:
                 if isinstance(proxy, bytes):
                     proxy = proxy.decode('utf-8')
                 http_proxy = 'http://' + proxy
@@ -47,26 +48,27 @@ class ValidityChecker(object):
                         # 有效代理存入redis
                         self._conn.putProxy(proxy)
                         logging.info('代理[%s]有效' % (proxy,))
-            except (TimeoutError, ClientProxyConnectionError) as e:
-                logging.warning('代理[%s]无效' % (proxy,))
-            except (ServerDisconnectedError, ClientResponseError, ClientConnectorError,
-                    ) as e:
-                logging.warning(e)
+        except (TimeoutError, ClientProxyConnectionError) as e:
+            logging.warning('代理[%s]无效' % (proxy,))
+        except (ServerDisconnectedError, ClientResponseError, ClientConnectorError,
+                ) as e:
+            logging.warning(e)
 
-    def check(self):
-        '''
-        异步校验所有代理
-        :return:
-        '''
-        logging.info("开启异步校验代理")
-        loop = asyncio.get_event_loop()
-        try:
-            tasks = [self.check_single_proxy(proxy) for proxy in self._raw_proxies]
-            loop.run_until_complete(asyncio.wait(tasks))
-        except ValueError:
-            logging.error("异步校验代理异常")
-        finally:
-            loop.close()
+
+def check(self):
+    '''
+    异步校验所有代理
+    :return:
+    '''
+    logging.info("开启异步校验代理")
+    loop = asyncio.get_event_loop()
+    try:
+        tasks = [self.check_single_proxy(proxy) for proxy in self._raw_proxies]
+        loop.run_until_complete(asyncio.wait(tasks))
+    except ValueError:
+        logging.error("异步校验代理异常")
+    finally:
+        loop.close()
 
 
 class PoolAdder(object):
