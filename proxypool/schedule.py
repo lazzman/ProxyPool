@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import time
+from asyncio import TimeoutError
 from multiprocessing import Process
 
 import aiohttp
@@ -33,27 +34,24 @@ class ValidityChecker(object):
         :param proxy:
         :return:
         '''
-        session = aiohttp.ClientSession()
-        try:
-            if isinstance(proxy, bytes):
-                proxy = proxy.decode('utf-8')
-            http_proxy = 'http://' + proxy
-            headers = {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.89 Safari/537.36'}
-            async with session.get(setting.CHECK_PROXY_USEFULL_URL, timeout=setting.CHECK_PROXY_USEFULL_TIMEOUT,
-                                   headers=headers, proxy=http_proxy) as r:
-                if r.status == 200:
-                    # 有效代理存入redis
-                    self._conn.putProxy(proxy)
-                    logging.info('代理[%s]有效' % (proxy,))
-        except (TimeoutError, ClientProxyConnectionError) as e:
-            logging.warning('代理[%s]无效' % (proxy,))
-        except (ServerDisconnectedError, ClientResponseError, ClientConnectorError,
-                ) as e:
-            logging.warning(e)
-        finally:
-            # 关闭会话
-            session.close()
+        with aiohttp.ClientSession() as session:
+            try:
+                if isinstance(proxy, bytes):
+                    proxy = proxy.decode('utf-8')
+                http_proxy = 'http://' + proxy
+                headers = {
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.89 Safari/537.36'}
+                async with session.get(setting.CHECK_PROXY_USEFULL_URL, timeout=setting.CHECK_PROXY_USEFULL_TIMEOUT,
+                                       headers=headers, proxy=http_proxy) as r:
+                    if r.status == 200:
+                        # 有效代理存入redis
+                        self._conn.putProxy(proxy)
+                        logging.info('代理[%s]有效' % (proxy,))
+            except (TimeoutError, ClientProxyConnectionError) as e:
+                logging.warning('代理[%s]无效' % (proxy,))
+            except (ServerDisconnectedError, ClientResponseError, ClientConnectorError,
+                    ) as e:
+                logging.warning(e)
 
     def check(self):
         '''
@@ -69,6 +67,7 @@ class ValidityChecker(object):
             logging.error("异步校验代理异常")
         finally:
             loop.close()
+
 
 class PoolAdder(object):
     '''
