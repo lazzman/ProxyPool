@@ -36,7 +36,7 @@ class ValidityChecker(object):
         '''
 
         try:
-            with aiohttp.ClientSession() as session:
+            async with aiohttp.ClientSession() as session:
                 if isinstance(proxy, bytes):
                     proxy = proxy.decode('utf-8')
                 http_proxy = 'http://' + proxy
@@ -48,11 +48,10 @@ class ValidityChecker(object):
                         # 有效代理存入redis
                         self._conn.putProxy(proxy)
                         logging.info('代理[%s]有效' % (proxy,))
-        except (TimeoutError, ClientProxyConnectionError) as e:
+        except (TimeoutError, ClientProxyConnectionError, ClientResponseError, ClientConnectorError) as e:
             logging.warning('代理[%s]无效' % (proxy,))
-        except (ServerDisconnectedError, ClientResponseError, ClientConnectorError,
-                ) as e:
-            logging.warning(e)
+        except (ServerDisconnectedError) as e:
+            logging.warning('服务端强制关闭了链接')
 
     def check(self):
         '''
