@@ -27,7 +27,7 @@ class ValidityChecker(object):
     def set_raw_proxies(self, proxies):
         self._raw_proxies = proxies  # 未校验的代理集合
         self._conn = RedisClient()
-        self._loop = asyncio.get_event_loop() # 协程事件循环对象
+        self._loop = asyncio.get_event_loop()  # 协程事件循环对象
 
     async def check_single_proxy(self, proxy):
         '''
@@ -131,7 +131,7 @@ class Schedule(object):
             logging.info("开始校验代理池代理有效性")
             count = int(0.5 * conn.queueLen)
             if count == 0:
-                logging.info("代理池中暂无代理，等待添加代理")
+                logging.info("代理池中暂无代理，等待添加代理，进程开始休眠")
                 time.sleep(cycle)
                 continue
             raw_proxies = conn.getProxy(count)
@@ -152,8 +152,11 @@ class Schedule(object):
         conn = RedisClient()
         adder = PoolAdder(upper_threshold)
         while True:
+            logging.info("开始校验代理池代理数量")
             if conn.queueLen < lower_threshold:
+                logging.info("开始添加代理池代理")
                 adder.pool_add_proxy()
+            logging.info("代理池代理数量充足，进程开始休眠")
             time.sleep(cycle)
 
     def run(self):
