@@ -21,9 +21,35 @@ conda env create -f conda-env.yml
 
 ---
 
+## 配置
+
+进入proxypool目录，修改setting.py文件
+
+---
+
 ## 运行
 
+使用conda命令切换运行环境
 
+```
+activate python36
+```
+
+开启API监听与代理池
+
+```
+python run.py
+```
+
+启动后默认监听127.0.0.1:5000，提供了两个获取代理的地址
+
+```
+# 获取1个代理
+http://127.0.0.1:5000/getProxy
+
+# 获取n个代理
+http://127.0.0.1:5000/getMoreProxy/n
+```
 
 ---
 
