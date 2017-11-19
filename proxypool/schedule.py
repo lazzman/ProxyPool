@@ -27,6 +27,7 @@ class ValidityChecker(object):
     def set_raw_proxies(self, proxies):
         self._raw_proxies = proxies  # 未校验的代理集合
         self._conn = RedisClient()
+        self._loop = asyncio.get_event_loop() # 协程事件循环对象
 
     async def check_single_proxy(self, proxy):
         '''
@@ -59,14 +60,15 @@ class ValidityChecker(object):
         :return:
         '''
         logging.info("开启异步校验代理")
-        loop = asyncio.get_event_loop()
+        loop = self._loop
         try:
             tasks = [self.check_single_proxy(proxy) for proxy in self._raw_proxies]
             loop.run_until_complete(asyncio.wait(tasks))
         except ValueError:
             logging.error("异步校验代理异常")
         finally:
-            loop.close()
+            # loop.close() 此处调用该方法会报错RuntimeError: Event loop is closed
+            pass
 
 
 class PoolAdder(object):

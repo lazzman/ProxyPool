@@ -17,7 +17,7 @@ PROXY_POOL_UPPER_THRESHOLD = 100
 CHECK_PROXY_USEFULL_URL = 'http://i5.pdim.gs/dmfd/200_200_100/4223837ac70f9f9ca0b8859ae9f08edf.jpeg'
 
 # 检测代理有效性等待的超时时间(单位秒)
-CHECK_PROXY_USEFULL_TIMEOUT = 9
+CHECK_PROXY_USEFULL_TIMEOUT = 5
 
 import logging
 
