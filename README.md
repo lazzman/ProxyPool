@@ -51,6 +51,12 @@ http://127.0.0.1:5000/getProxy
 http://127.0.0.1:5000/getMoreProxy/n
 ```
 
+启动服务
+
+```
+python run.py
+```
+
 ---
 
 ## 模块介绍
